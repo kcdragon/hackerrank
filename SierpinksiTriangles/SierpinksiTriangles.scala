@@ -2,37 +2,19 @@
 
 object SierpinksiTriangles {
   def drawTriangles(n: Int) {
-    // #0 - triangle base size is (63 - 0) / 1 = 63
-    // #1 - triangle base size is (63 - 1) / 2 = 31
-    // #2 - triangle base size is (63 - 3) / 4 = 15
-    // #3 - triangle base size is                 7
-    // #4 - triangle base size is                 3
-    // #5 - triangle base size is                 1
-    // #n - triangle base size is (2 ^ (6 - n)) - 1
-
-    // #0
-    printTriangle(drawTriangle(63))
-    println
-
-    // #1
-    printTriangle(combineTriangles(combineTriangles(underscoreSquare(16, 16), drawTriangle(31)), underscoreSquare(16, 16)))
-    printTriangle(combineTriangles(drawTriangle(31), drawTriangle(31)))
-    println
-
-    // #2
-    printTriangle(combineTriangles(combineTriangles(underscoreSquare(8, 8), drawTriangle(15)), underscoreSquare(8, 8)))
-    printTriangle(combineTriangles(drawTriangle(15), drawTriangle(15)))
-    println
+    val triangle = drawTriangle(scala.math.pow(2, 6 - n).toInt - 1)
   }
 
-  def combineTriangles(triangle1: List[List[String]], triangle2: List[List[String]]): List[List[String]] = triangle1 match {
+  def combine(triangles: List[List[List[String]]]): List[List[String]] = triangles(0) match {
     case Nil => List()
-    case _ => (triangle1(0) ++ triangle2(0)) :: combineTriangles(triangle1.drop(1), triangle2.drop(1))
+    case _ => triangles.flatMap(_(0)) :: combine(triangles.map(_.drop(1)))
   }
 
-  def underscoreSquare(size: Int, height: Int): List[List[String]] = height match {
+  def drawUnderscoreSquare(size: Int): List[List[String]] = drawUnderscoreRectangle(size, size)
+
+  def drawUnderscoreRectangle(width: Int, height: Int): List[List[String]] = height match {
     case 0 => List()
-    case _ => drawString(size, "_") :: underscoreSquare(size, height - 1)
+    case _ => drawString(width, "_") :: drawUnderscoreRectangle(width, height - 1)
   }
 
   def printTriangle(triangle: List[List[String]]) {
@@ -55,6 +37,56 @@ object SierpinksiTriangles {
 
   def main(args: Array[String]) {
     //drawTriangles(readInt())
-    drawTriangles(1)
+    //drawTriangles(1)
+
+    var triangle: List[List[String]] = List()
+    var n = 0
+
+    // #0
+    n = 0
+    //triangle = drawTriangle(63)
+    triangle = drawTriangle(scala.math.pow(2, 6 - n).toInt - 1)
+    // 1 triangle
+    printTriangle(triangle)
+    println
+
+    // #1
+    n = 1
+    //triangle = drawTriangle(31)
+    triangle = drawTriangle(scala.math.pow(2, 6 - n).toInt - 1)
+    // 1 triangle  2 rectangles
+    // 2 triangles 1 rectangle
+    printTriangle(combine(List(drawUnderscoreSquare(16), triangle, drawUnderscoreRectangle(16, 16))))
+    printTriangle(combine(List(triangle, drawUnderscoreRectangle(1, 31), triangle)))
+    println
+
+    // #2
+    n = 2
+    //triangle = drawTriangle(15)
+    triangle = drawTriangle(scala.math.pow(2, 6 - n).toInt - 1)
+    // 1 triangle  2 rectangles
+    // 2 triangles 1 rectangle
+    // 4 triangles
+    printTriangle(combine(List(
+      drawUnderscoreRectangle(24, 8),
+      triangle,
+      drawUnderscoreRectangle(24, 8)
+    )))
+    printTriangle(combine(List(
+      drawUnderscoreRectangle(16, 8), triangle,
+      drawUnderscoreRectangle(1, 8),
+      triangle, drawUnderscoreRectangle(16, 8)
+    )))
+    printTriangle(combine(List(
+      drawUnderscoreSquare(8), triangle, drawUnderscoreSquare(8),
+      drawUnderscoreRectangle(1, 8),
+      drawUnderscoreSquare(8), triangle, drawUnderscoreSquare(8)
+    )))
+    printTriangle(combine(List(
+      triangle, drawUnderscoreRectangle(1, 8), triangle,
+      drawUnderscoreRectangle(1, 8),
+      triangle, drawUnderscoreRectangle(1, 8), triangle
+    )))
+    println
   }
 }
